@@ -1,0 +1,93 @@
+#!/bin/bash
+#Description: copy file between local and remote host ,and execute remote command
+#Auhtor: Carl
+
+export PATH=/bin:/sbin:/usr/bin:/usr/bin:/usr/local/bin:/usr/local/sbin
+
+usage()
+{
+cat << EOF
+Usage: `basename $0` -h <host> -f <file> -p [remotepath]
+       `basename $0` -H <hostfile> -f <file> -p [remotepath]
+       `basename $0` -h <host> -e <command>
+
+-H hostfile : Host file,one IP per line. (Example: 192.168.1.201 or root@192.168.1.201)
+-h host1[,host2 ...]: remote host
+-f file1[,file2 ...]: copy local file to remote host
+-p [remotepath]: the path of remote host,default '/tmp'
+-e command: execute command on remote host
+EOF
+}
+
+if [ $# -ne 2  -a $# -ne 4 -a $# -ne 6 ];then
+	usage ; exit 4
+fi
+
+while :;do
+	case $1 in
+	"")
+		break ;;
+	'-h')
+		hostlist=`echo $2 | sed 's/,/ /g'`
+		;;
+	'-H')
+		[ ! -f "$2" ] && echo "File not exist.." && exit 5
+		hostlist=`cat $2 | grep -v "^#"`
+		;;
+	'-f')
+		filelist=`echo $2 | sed 's/,/ /g'`
+		;;
+	'-p')
+		rpath="$2" ;;
+	'-e')
+		command=$2
+		;;
+	*)
+		usage ;;
+	esac
+	shift 2
+done
+
+if [ -z "$hostlist" ];then
+	echo "Must be assign remote host ..."
+	exit 1
+#else
+#	if echo  "$hostlist" | egrep "[^0-9\.]" &> /dev/null;then
+#		echo "Invalid Host"
+#		exit 3
+#	fi
+fi
+
+rpath=${rpath:-'/tmp'}
+if ! echo "$rpath" | grep "^/.*" &> /dev/null;then
+	echo "Invalid path ..."	
+	exit 2
+fi
+
+if [ -n "$filelist" ];then
+	for f in $filelist;do
+		if [ -f "$f" ];then
+			for h in $hostlist;do
+				rsync -azP $f $h:$rpath/ &> /dev/null
+				if [ $? -eq 0 ];then
+					echo -e "copy to $h ...		[ \033[1;32mSuccess\033[0m ]"
+				else
+					echo -e "copy to $h ...		[ \033[1;31mFailed\033[0m ]"
+				fi
+			done
+		else
+			echo "No such file or directory."
+		fi
+	done
+fi
+
+if [ -n "$command" ];then
+	for h in $hostlist;do
+		ssh $h "$command" 
+		if [ $? -eq 0 ];then
+			echo -e "execute command on $h ...		[ \033[1;32mSuccess\033[0m ]"
+		else
+			echo -e "execute command on $h ...		[ \033[1;31mFailed\033[0m ]"
+		fi
+	done
+fi

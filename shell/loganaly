@@ -1,0 +1,124 @@
+#!/bin/bash
+#Description: Nginx log analyser
+#Author: Charles
+#
+
+usage() {
+cat << EOF
+Usage:
+`basename $0` -f filename [-stime timeformat] [-etime timeformat] [-u url] [-addr address] [-n line]
+timeformat:  [hour:min:second] or [year:month:day:hour:min:second].
+
+Example:
+`basename $0` -f access.log -stime 15:30:00 -etime 17:00:00 
+`basename $0` -f access.log -stime 2014:10:04:15:30:00 -etime 2014:10:04:17:00:00 -u /index.php -n 30
+`basename $0` -f access.log -stime 15:30:00 -etime 17:00:00 -addr 8.8.8.8
+EOF
+}
+
+if (($#<2)) || ((($#%2)!=0));then
+	usage
+	exit 2
+fi
+
+#fetch arguments.
+while :; do
+	case $1 in
+	"")
+		break ;;
+	'-f')
+		if [ -f $2 ];then
+			logfile=$2  
+		else
+			echo "No such file."
+			exit 1
+		fi
+		;;
+	'-stime')
+		if [ ${#2} -gt 8 ];then
+			syear=`echo "$2" | awk	-F ":" '{print $1}'`
+			smonth=`echo "$2" | awk	-F ":" '{print $2}'`
+			sday=`echo "$2" | awk	-F ":" '{print $3}'`
+			shour=`echo "$2" | awk	-F ":" '{print $4}'`
+			smin=`echo "$2" | awk	-F ":" '{print $5}'`
+			ssecond=`echo "$2" | awk -F ":" '{print $6}'`
+		else
+			syear=`date +"%Y"`
+			smonth=`date +"%m"`
+			sday=`date -d "yesterday" +"%d"`
+			shour=`echo "$2" | awk	-F ":" '{print $1}'`
+			smin=`echo "$2" | awk	-F ":" '{print $2}'`
+			ssecond=`echo "$2" | awk -F ":" '{print $3}'`
+		fi
+			
+		;;
+	'-etime')
+		if [ ${#2} -gt 8 ];then
+			eyear=`echo "$2" | awk	-F ":" '{print $1}'`
+			emonth=`echo "$2" | awk	-F ":" '{print $2}'`
+			eday=`echo "$2" | awk	-F ":" '{print $3}'`
+			ehour=`echo "$2" | awk	-F ":" '{print $4}'`
+			emin=`echo "$2" | awk	-F ":" '{print $5}'`
+			esecond=`echo "$2" | awk -F ":" '{print $6}'`
+		else
+			eyear=`date +"%Y"`
+			emonth=`date +"%m"`
+			eday=`date -d "yesterday" +"%d"`
+			ehour=`echo "$2" | awk	-F ":" '{print $1}'`
+			emin=`echo "$2" | awk	-F ":" '{print $2}'`
+			esecond=`echo "$2" | awk -F ":" '{print $3}'`
+		fi
+		;;
+	'-u')
+		url=$2 ;;
+	'-addr')
+		address=$2 ;;
+	'-n')
+		line=$2 ;;
+	esac
+	shift 2
+done
+
+if [ -z "$logfile" ];then
+	usage ; exit 3
+fi
+
+line=${line:-20}
+		
+if [ -n "$ssecond" ] && [ -n "$esecond" ];then
+	logtmp="/tmp/$(basename $logfile)_${shour}:${smin}:${ssecond}_${ehour}:${emin}:${esecond}"
+	stime=`awk -v year=$syear -v mon=$smonth -v day=$sday -v hour=$shour -v min=$smin -v sec=$ssecond 'BEGIN{print strftime("%d\\\/%h\\\/%Y:%H:%M:%S",mktime(year" "mon" " day" " hour" " min" " sec))}'`
+	etime=`awk -v year=$eyear -v mon=$emonth -v day=$eday -v hour=$ehour -v min=$emin -v sec=$esecond 'BEGIN{printf strftime("%d\\\/%h\\\/%Y:%H:%M:%S",mktime(year" "mon" " day" " hour" " min" " sec))}'`
+	if [ ! -f "$logtmp" ];then
+		sed -n "/$stime/,/$etime/p" $logfile  > $logtmp
+	fi
+
+	if [ -z "$url" ] && [ -z "$address" ];then
+		awk '{url[$7]++} END{for(i in url) printf "%-s\t%s\n",url[i],i}' $logtmp |sort -rn| awk 'BEGIN{print "COUNT   URL"} NR==1,NR=='"$line"''
+		awk '{ip[$1]++} END{for(i in ip) printf "%-s\t%s\n",ip[i],i}' $logtmp |sort -rn| awk 'BEGIN{print "\nCOUNT   ADDRESS"} NR==1,NR=='"$line"''
+	fi
+
+	if [ -n "$url" ];then
+		url=`echo $url|sed 's#\/#\\\/#'`
+		awk '/'"$url"'/{ip[$1]++} END{for(i in ip) printf "%-s\t%s\n",ip[i],i}' $logtmp |sort -rn| awk 'BEGIN{print "COUNT   ADDRESS"} NR==1,NR=='"$line"''
+	fi
+
+	if [[ -n $address ]];then
+		awk '/'"$address"'/{url[$7]++} END{for(i in url) printf "%-s\t%s\n",url[i],i}' $logtmp |sort -rn| awk 'BEGIN{print "\nCOUNT   URL"} NR==1,NR=='"$line"''
+	fi
+#	rm $logtmp
+else
+	if [ -z "$url" ] && [ -z "$address" ];then
+		awk '{url[$7]++} END{for(i in url) printf "%-s\t%s\n",url[i],i}' $logfile |sort -rn| awk 'BEGIN{print "COUNT   URL"} NR==1,NR=='"$line"''
+		awk '{ip[$1]++} END{for(i in ip) printf "%-s\t%s\n",ip[i],i}' $logfile|sort -rn| awk 'BEGIN{print "\nCOUNT   ADDRESS"} NR==1,NR=='"$line"''
+	fi
+
+	if [ -n "$url" ];then
+		url=`echo $url|sed 's#\/#\\\/#'`
+		awk '/'"$url"'/{ip[$1]++} END{for(i in ip) printf "%-s\t%s\n",ip[i],i}' $logfile |sort -rn| awk 'BEGIN{print "COUNT   ADDRESS"} NR==1,NR=='"$line"''
+	fi
+
+	if [ -n "$address" ];then
+		awk '/'"$address"'/{url[$7]++} END{for(i in url) printf "%-s\t%s\n",url[i],i}' $logfile|sort -rn| awk 'BEGIN{print "\nCOUNT   URL"} NR==1,NR=='"$line"''
+	fi
+fi	
