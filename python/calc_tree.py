@@ -4,8 +4,8 @@
 
 from __future__ import division
 #from functools import partial
-import time
 
+import time
 
 func_map = {
 	'+': lambda x,y: x + y,
