@@ -1,6 +1,3 @@
-# coding=utf-8
-# use in unix
-
 import os
 import tty
 import sys
@@ -16,17 +13,15 @@ class Password:
         self.old_tty = termios.tcgetattr(self.fd)
     
     def unixstyle_password(self, prompt):
-        fd = sys.stdin.fileno()
-
         # get old tty attribute
-        new = termios.tcgetattr(fd)
+        new = termios.tcgetattr(self.fd)
         # set new tty attribute(no display)
         new[3] = new[3] & ~termios.ECHO
         try:
-            termios.tcsetattr(fd, termios.TCSADRAIN, new)
+            termios.tcsetattr(self.fd, termios.TCSADRAIN, new)
             passwd = raw_input(prompt)
         finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, self.old_tty)
+            termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_tty)
         return passwd
 
     @staticmethod
