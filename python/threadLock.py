@@ -4,7 +4,7 @@
 import threading
 import Queue
 import time
-import logging 
+import logging
 
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(threadName)s [%(levelname)s] %(message)s')
@@ -17,7 +17,7 @@ class Demo:
         self.lock = threading.Lock()
         self.event = threading.Event()
         self.product = False
-    
+
     def consumer(self):
         while not self.event.is_set():
             with self.lock:
@@ -28,7 +28,7 @@ class Demo:
                 except Queue.Empty:
                     logging.warn('no data')
             self.event.wait(0.5)
-    
+
     def producer(self):
         for i in range(30):
             data = 'data{0}\n'.format(str(i))
@@ -58,4 +58,3 @@ if __name__ == '__main__':
     threading.Thread(target=demo.producer, name='producer').start()
     for i in range(4):
         threading.Thread(target=demo.consumer, name='consumer-{0}'.format(str(i))).start()
-
