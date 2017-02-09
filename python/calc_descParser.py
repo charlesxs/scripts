@@ -4,7 +4,6 @@
 #     reference: python3 cookbook, chapter 2, 2.19
 #
 
-import time
 import re
 from collections import namedtuple
 # from functools import partial
@@ -140,15 +139,15 @@ def calc(tree):
     
 
 if __name__ == '__main__':
-#    expr = '2 + (3 + 4) * 5'
-    #expr = '(3+4) * 5 / ((2+3) *3)'
+   # expr = '2 + (3 + 4) * 5'
+   # expr = '(3+4) * 5 / ((2+3) *3)'
     expr = '(3 + 4) + 5  / ((2+3) * 3) * 3'
-    #alist, blist = list(), list()
+    # alist, blist = list(), list()
     
     parser = DescParser()
     retree = parser.parse(expr)
-    #ret.middle_visit(alist.append)
-    #ret.first_visit(blist.append)
-    #print(alist, blist)
+    # ret.middle_visit(alist.append)
+    # ret.first_visit(blist.append)
+    # print(alist, blist)
     print(calc(retree))
 
