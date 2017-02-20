@@ -46,7 +46,7 @@ killer() {
 }
 
 
-_equal_exec() {
+_alive_exec() {
 	local _action=$1
 	local _pid=$2
 	local _thome=$3
@@ -63,7 +63,7 @@ _equal_exec() {
 }
 
 
-_not_equal_exec() {
+_defunct_exec() {
 	local _action=$1
 	local _thome=$2
 	case "$_action" in
@@ -101,13 +101,13 @@ exector() {
 		[ ! -d $_thome ] && echo -e "\033[31mNot found tomcat home ${_thome}\033[0m" && continue
 
 		if ((${#ALL_CONTAINERS[*]} == 0));then
-			_not_equal_exec "$_action" "$_thome"	
+			_defunct_exec "$_action" "$_thome"	
 		else
 			_pid=`_check_chain ${_thome}`	
 			if (($_pid > 0)); then
-				_equal_exec "$_action" "$_pid" "$_thome"
+				_alive_exec "$_action" "$_pid" "$_thome"
 			else
-				_not_equal_exec "$_action" "$_thome"
+				_defunct_exec "$_action" "$_thome"
 			fi
 		fi
 	done
@@ -143,7 +143,7 @@ stop-all)
 status)
 	[[ -z "${ALL_CONTAINERS}" ]] && echo "No tomcat has ran ..." && exit 2
 	for i in `seq 1 2 ${#ALL_CONTAINERS[*]}`; do
-		echo -e "tomcat \"${ALL_CONTAINERS[$i]}\" is running, pid \033[32m${ALL_CONTAINERS[$((i-1))]}\033[0m ..."
+		echo -e "\"${ALL_CONTAINERS[$i]}\" is running, pid \033[32m${ALL_CONTAINERS[$((i-1))]}\033[0m ..."
 	done
 ;;
 
