@@ -135,14 +135,14 @@ restart)
 
 stop-all)
 	echo "stopping all the tomcats ..."
-	for i in `seq 1 2 ${#ALL_CONTAINERS[*]}`; do
+	for ((i=1; i<=${#ALL_CONTAINERS[*]}; i+=2)); do
 		kill ${ALL_CONTAINERS[$((i-1))]}
 	done
 ;;
 
 status)
 	[[ -z "${ALL_CONTAINERS}" ]] && echo "No tomcat has ran ..." && exit 2
-	for i in `seq 1 2 ${#ALL_CONTAINERS[*]}`; do
+	for ((i=1; i<=${#ALL_CONTAINERS[*]}; i+=2)); do
 		echo -e "\"${ALL_CONTAINERS[$i]}\" is running, pid \033[32m${ALL_CONTAINERS[$((i-1))]}\033[0m ..."
 	done
 ;;
