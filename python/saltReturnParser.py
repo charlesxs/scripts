@@ -68,36 +68,52 @@ def change_color(chars, color):
     return '{0}{1}{2}'.format(getattr(ColorDefine, color.upper()), chars, ColorDefine.CLOSE_COLOR)
 
 
-def output_result(jfile):
+def get_salt_hots(hostsfile):
+    if not os.path.isfile(hostsfile):
+        raise IOError('not found hostsfile')
+    with open(hostsfile) as f:
+        return [line.strip() for line in f.readlines()]
+
+
+def output_result(jfile, hostslist):
     parser = JsonFileParser(jfile)
     hostnum, failed_task_num = 0, 0
+    return_hosts = []
     for js in parser.iparse():
         hostnum += 1
-        for host in js:
-            if not isinstance(js[host], dict):
-                print('Host {0}:\n\tresult: {1}'.format(change_color(host, 'yellow'),
-                                                        change_color(js[host], 'red')))
-                failed_task_num += 1
-                continue
-            else:
-                print('Host {0}:'.format(change_color(host, 'yellow')))
+        host = js.keys()[0]
+        return_hosts.append(host)
 
-            for task in js[host]:
-                result = js[host][task]['result']
-                if result is True:
-                    print('\ttask: {0}  result: {1}'.format(task, change_color(result, 'green')))
-                else:
-                    failed_task_num += 1
-                    print('\ttask: {0}  result: {1}'.format(task, change_color(result, 'red')))
+        if not isinstance(js[host], dict):
+            print('Host {0}:\n\tresult: {1}'.format(change_color(host, 'yellow'),
+                                                    change_color(js[host], 'red')))
+            if js[host] is not True:
+                failed_task_num += 1
+            continue
+        else:
+            print('Host {0}:'.format(change_color(host, 'yellow')))
+
+        for task in js[host]:
+            result = js[host][task]['result']
+            if result is True:
+                print('\ttask: {0}  result: {1}'.format(task, change_color(result, 'green')))
+            else:
+                failed_task_num += 1
+                print('\ttask: {0}  result: {1}'.format(task, change_color(result, 'red')))
 
     print('\nSummary:'
-          '\n\t有返回值的主机数: {0}'
-          '\n\t执行失败的任务数: {1}'.format(hostnum, failed_task_num))
+          '\n\tAll the hosts number: {0}'
+          '\n\tReturned hosts number: {1}'
+          '\n\tFailed tasks number: {2}'
+          '\n\tNot Returned hosts:'.format(len(hostslist), hostnum, failed_task_num))
+    no_return_hosts = set(hostslist).difference(set(return_hosts))
+    for h in no_return_hosts:
+        print('\t\t{0}'.format(change_color(h, 'red_dark')))
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: {0} {1}'.format(sys.argv[0], 'filename'))
+    if len(sys.argv) != 3:
+        print('Usage: {0} {1} {2}'.format(sys.argv[0], 'filename', 'hostsfile'))
         exit(1)
 
-    jfile = os.path.abspath(sys.argv[1])
-    output_result(jfile)
+    output_result(os.path.abspath(sys.argv[1]),
+                  get_salt_hots(os.path.abspath(sys.argv[2])))
