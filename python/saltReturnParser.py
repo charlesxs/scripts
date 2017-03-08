@@ -95,9 +95,9 @@ def output_result(jfile):
           '\n\t执行失败的任务数: {1}'.format(hostnum, failed_task_num))
 
 if __name__ == '__main__':
-    # if len(sys.argv) != 2:
-    #     print('Usage: {0} {1}'.format(sys.argv[0], 'filename'))
-    #     exit(1)
+    if len(sys.argv) != 2:
+        print('Usage: {0} {1}'.format(sys.argv[0], 'filename'))
+        exit(1)
 
-    jfile = os.path.abspath('result.txt')
+    jfile = os.path.abspath(sys.argv[1])
     output_result(jfile)
