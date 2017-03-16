@@ -1,148 +1,102 @@
-#!/usr/bin/env python3
 # coding=utf-8
 #
 
-class Node(object):
-	def __init__(self, data):
-		self.data = data
-		self.next = None
-	
-class MyList(object):
-	def __init__(self):
-		self.head = None
-		self.tail = None
-	
-	def __len__(self):
-		cursor = self.head
-		length = 1
-		if not self.head:
-			return None
-		while cursor.next:
-			cursor = cursor.next
-			length += 1
-		return length
+class ListNode:
+    def __init__(self, data, next_=None):
+        self.data = data
+        self.next_ = next_
 
-	def append(self, data):
-		node = Node(data)
-		if not self.head:
-			self.head = node
-			self.tail = node
-		else:
-			self.tail.next = node
-			self.tail = node
-	
-	def iter(self):
-		if not self.head:
-			return
-		cursor = self.head
-		yield cursor.data
-		while cursor.next:
-			cursor = cursor.next
-			yield cursor.data
-	
-	def insert(self, index, value):
-		cursor = self.head
-		CurrentIndex = 0
 
-		if not cursor:
-			raise Exception('It is a empty list.')
+class LinkList:
+    def __init__(self):
+        self._head = None
 
-		while CurrentIndex < index - 1:
-			cursor = cursor.next
-			if not cursor:
-				raise Exception('Index is too large.')
-			CurrentIndex += 1
-		
-		node = Node(value)
-		node.next = corsor.next
-		cursor.next = node
-		if node.next is None:
-			self.tail = node
-	
-	def remove(self, value):
-		cursor = self.head
-		if cursor.data == value:
-			self.head = None
-			self.tail = None
-		elif not cursor:
-			raise Exception('It is a empty list.')
+    def __len__(self):
+        return self.length
 
-		while cursor.next:
-			if not cursor.next:
-				raise Exception('Not found this value.')
-			if cursor.next.data == value:
-				cursor.next = cursor.next.next
-			else:
-				cursor = cursor.next
+    def is_empty(self):
+        return self._head is None
 
-		if cursor.next is None:
-			self.tail = cursor
+    @property
+    def length(self):
+        cursor, curindex = self._head, 0
+        while cursor is not None:
+            curindex += 1
+            cursor = cursor.next_
+        return curindex
 
-	def pop(self, index=None):
-		cursor = self.head
-		curidx = 0
-		if not cursor:
-			raise Exception('It is a empty list.')
+    def prepend(self, data):
+        if self._head is None:
+            self._head = ListNode(data)
+        else:
+            self._head = ListNode(data, self._head)
 
-		if index is None:
-			idx = len(self) - 1
-		else:
-			idx = index
+    def append(self, data):
+        if self._head is None:
+            self._head = ListNode(data)
+            return
 
-		if idx == 0:
-			data = self.head.data
-			self.head = cursor.next
-			return data
-		
-		while cursor.next:
-			if curidx + 1 == idx:
-				data = cursor.data
-				cursor.next = cursor.next.next
-				break
-			cursor = cursor.next
-			curidx += 1
+        cursor = self._head
+        while cursor.next_ is not None:
+            cursor = cursor.next_
 
-		if not cursor.next:
-			self.tail = cursor
-		return data
-	
-	def extend(self, iteration):
-		cursor = self.tail
-		if not cursor:
-			raise Exception('It is a empty list.')
+        cursor.next_ = ListNode(data)
 
-		for i in iteration:
-			node = Node(i)
-			cursor.next = node
-			cursor, self.tail = cursor.next, cursor.next
+    def insert(self, index, data):
+        if self._head is None or index == 0:
+            self.prepend(data)
+            return 
 
-				
+        cursor, curindex = self._head, 0
+        while cursor.next_ is not None and curindex < (index - 1):
+            curindex += 1
+            cursor = cursor.next_
 
-if __name__ == '__main__':
-	linkList = MyList()
-	# append
-	for i in range(10):
-		linkList.append(i)
-		print('append %s in linkList.' % i)
-	print()
+        if (index -1) > curindex:
+            self.append(data)
+            return 
 
-	# remove
-#	print("remove value from list")
-#	linkList.remove(3)
+        cursor.next_ = ListNode(data, cursor.next_)
 
-	# count length
-	print("List Lenght: %s" % len(linkList))
+    def remove(self, data):
+        if self._head is None:
+            raise TypeError('list is empty!')
+        
+        if self._head.data == data:
+            self._head = self._head.next_
+            return 
 
-    # pop operation
-	print("POP operation\n")
-	linkList.pop()
+        cursor = self._head 
+        while cursor.next_ is not None and cursor.next_.data != data:
+            cursor = cursor.next_
 
-	# extend operation
-	print('extend opration.')
-	linkList.extend(['a', 'b'])
+        if cursor.next_ is None:
+            raise ValueError('data {0} is not in list'.format(data))
+        cursor.next_ = cursor.next_.next_
 
-	# see
-	for i in linkList.iter():
-		print(i, end=" ")
-	print()
 
+    def pop(self):
+        if self._head is None:
+            raise TypeError('list is empty!')
+
+        node = self._head
+        self._head = self._head.next_
+        return node.data
+
+    def reverse(self):
+        if self._head is None:
+            raise TypeError('list is empty!')
+
+        cursor = self._head
+        while cursor.next_ is not None:
+            current, cursor.next_ = cursor.next_, cursor.next_.next_
+            current.next_, self._head = self._head, current
+
+    def printall(self):
+        if self._head is None:
+            return 
+
+        cursor = self._head
+        while cursor is not None:
+            print cursor.data,
+            cursor = cursor.next_
