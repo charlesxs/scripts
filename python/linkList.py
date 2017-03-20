@@ -92,6 +92,27 @@ class LinkList:
             current, cursor.next_ = cursor.next_, cursor.next_.next_
             current.next_, self._head = self._head, current
 
+    def sort(self):
+        if self._head is None or self._head.next_ is None:
+            return
+
+        cursor = self._head.next_
+        self._head.next_ = None
+        while cursor is not None:
+            p, q = None, self._head
+            while q is not None and q.data <= cursor.data:
+                p = q
+                q = q.next_
+
+            nc = cursor.next_
+            if p is None:
+                cursor.next_ = self._head
+                self._head = cursor
+            else:
+                cursor.next_ = p.next_
+                p.next_ = cursor
+            cursor = nc
+
     def printall(self):
         if self._head is None:
             return 
