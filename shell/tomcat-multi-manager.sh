@@ -7,7 +7,7 @@
 #
 # Source function library
 . /etc/rc.d/init.d/functions
-export  PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/java/default/bin:$PATH 
+export  PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/java/default/bin:$PATH
 export JAVA_HOME=/usr/java/default
 
 ACTION=$1; shift
@@ -35,11 +35,11 @@ killer() {
 	local _pid=$1
 	local _thome=${2%/}
 	local _timeout=${3:-60}
-	local _cpid	
+	local _cpid
 	kill $_pid
 	_thome=${_thome//\//\\/}
 	for ((i=1; i<=$_timeout; i++)); do
-		_cpid=`ps -e -o pid,cmd | awk '/'"$_thome"'/ && /java/ && !/awk/{print $1}'`
+		_cpid=`ps -e -o pid,cmd | awk '/catalina.home='"$_thome"' / && /java/ && !/awk/{print $1}'`
 		[ -z "$_cpid" ] && return 0 || { echo -n '.'; sleep 1; }
 	done
 	return 1
@@ -51,12 +51,12 @@ _alive_exec() {
 	local _pid=$2
 	local _thome=$3
 	case "$_action" in
-	'start') 
+	'start')
 		echo -e "\"${_thome}\" is running, pid \033[32m$_pid\033[0m ..." ;;
 	'stop')
 		echo -n "Stopping tomcat ${_thome} ..."
 		killer $_pid "$_thome"
-		[ "$?" -eq 0 ] && success $"$base startup" || failure $"$base startup"
+		[ "$?" -eq 0 ] && success || failure
 		echo
 		;;
 	esac
@@ -101,9 +101,9 @@ exector() {
 		[ ! -d $_thome ] && echo -e "\033[31mNot found tomcat home ${_thome}\033[0m" && continue
 
 		if ((${#ALL_CONTAINERS[*]} == 0));then
-			_defunct_exec "$_action" "$_thome"	
+			_defunct_exec "$_action" "$_thome"
 		else
-			_pid=`_check_chain ${_thome}`	
+			_pid=`_check_chain ${_thome}`
 			if (($_pid > 0)); then
 				_alive_exec "$_action" "$_pid" "$_thome"
 			else
@@ -126,7 +126,7 @@ stop)
 ;;
 
 restart)
-	exector "stop" 
+	exector "stop"
 	unset ALL_CONTAINERS
 	sleep 1
 	ALL_CONTAINERS=(`all_live_containers`)
@@ -136,14 +136,14 @@ restart)
 stop-all)
 	echo "stopping all the tomcats ..."
 	for ((i=1; i<=${#ALL_CONTAINERS[*]}; i+=2)); do
-		kill ${ALL_CONTAINERS[$((i-1))]}
+			kill ${ALL_CONTAINERS[$((i-1))]}
 	done
 ;;
 
 status)
 	[[ -z "${ALL_CONTAINERS}" ]] && echo "No tomcat has ran ..." && exit 2
 	for ((i=1; i<=${#ALL_CONTAINERS[*]}; i+=2)); do
-		echo -e "\"${ALL_CONTAINERS[$i]}\" is running, pid \033[32m${ALL_CONTAINERS[$((i-1))]}\033[0m ..."
+			echo -e "\"${ALL_CONTAINERS[$i]}\" is running, pid \033[32m${ALL_CONTAINERS[$((i-1))]}\033[0m ..."
 	done
 ;;
 
