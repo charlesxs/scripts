@@ -38,15 +38,9 @@ func RestoreAddr(addr string) []string {
 
 func isValid(s string) bool {
 	i, e := strconv.Atoi(s)
-
-	if e != nil {
+	if e != nil || i > 255 {
 		return false
 	}
-
-	if i > 255 {
-		return false
-	}
-
 	return true
 }
 
