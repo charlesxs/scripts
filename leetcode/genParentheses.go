@@ -73,7 +73,7 @@ func main() {
 //		fmt.Println(v)
 //	  default:
 //	  }
-//	}
+// }
 // 首先，如果 select 内部没有default 语句, 等于就是不忽略所有channel都没准备好的情况，那么在 genParen这个 goroutine生成完所有的括号后，程序会报 deadlock,
 // 然后退出。
 // 而加上 default 程序虽然不会报deadlock退出，但是当 genParen生成完所有的括号后, 整个程序就阻塞了, 并不会退出。这是因为你在主goroutine 中监听并从一个
