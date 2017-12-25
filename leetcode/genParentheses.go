@@ -55,7 +55,7 @@ func genParen(rchain chan string, r string, n, lc, rc int) {
 
 
 func main() {
-	GenParentheses(4)
+	GenParentheses(3)
 }
 
 
@@ -72,7 +72,7 @@ func main() {
 //	  case v := <- rchain:
 //		fmt.Println(v)
 //	  default:
-//	  }
+//    }
 // }
 // 首先，如果 select 内部没有default 语句, 等于就是不忽略所有channel都没准备好的情况，那么在 genParen这个 goroutine生成完所有的括号后，程序会报 deadlock,
 // 然后退出。
@@ -81,5 +81,5 @@ func main() {
 // 又没有数据可以向这个channel中发送, 那么程序就出现了死锁. (即所有的goroutine都被阻塞住了.)
 //
 // 所以在这种情况下, 使用最后GenParentheses函数中的写法, 让接受channel的部分不在主线程中运行, 而生成数据的部分运行在main goroutine中, 这样数据生成完后, main
-// goroutine 就会退出，相应的 接受部分的 goroutine 也就会退出了，不会向main goroutine一样永远阻塞.
+// goroutine 就会退出，相应的 接受部分的 goroutine 也会随之退出.
 //
