@@ -56,3 +56,6 @@ func main()  {
 
 	fmt.Println(FindMedianOfTwoArrays(ary1, ary2))
 }
+
+// 问题描述: https://leetcode.com/problems/median-of-two-sorted-arrays/description/
+//

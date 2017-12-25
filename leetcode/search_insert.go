@@ -23,3 +23,7 @@ func main() {
 
 	fmt.Print(SearchInsert(target, ary))
 }
+
+
+// 问题描述: https://leetcode.com/problems/search-insert-position/description/
+//

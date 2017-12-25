@@ -59,6 +59,7 @@ func main() {
 }
 
 
+// 问题描述: https://leetcode.com/problems/generate-parentheses/description/
 // 写这段代码的时候遇到几个小问题:
 // 1. 一个slice 当作参数传递给另外一个函数的时候, 如果在另外的函数使用 s = append(s, xx) 这时候原函数中的slice s 并没有相应的改变,
 // 但是如果使用 s[0] = xx, 那么原函数的slice s 第0个元素会改变, 因为 append后 虽然slice底层的数组没有变化, 但是上层的引用(slice

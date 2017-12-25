@@ -8,14 +8,13 @@ import (
 
 func RestoreAddr(addr string) []string {
 	var (
-		res = make([]string, 0, 12)
+		res = make([]string, 0, 27)
 		addrLen = len(addr)
 	)
 
 	if addrLen < 4 || addrLen > 12 {
 		return res
 	}
-
 
 	for i:=3; i>0; i-- {
 		for j:=3; j>0; j-- {
@@ -50,9 +49,14 @@ func main() {
 	//str := "1111111111"
 	//str := "123456789"
 	//str := "12345678"
+	//str := "1721702"
 	//str := "123456"
 	//str := "12345"
 	//str := "1234"
 	res := RestoreAddr(str)
 	fmt.Println(res, len(res))
 }
+
+
+// 问题描述: https://leetcode.com/problems/restore-ip-addresses/description/
+//

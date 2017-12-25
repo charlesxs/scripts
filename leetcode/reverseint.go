@@ -46,3 +46,7 @@ func main() {
 	fmt.Println(ReverseInt(123))
 	fmt.Println(ReverseInt(-123))
 }
+
+
+// 问题描述: https://leetcode.com/problems/reverse-integer/description/
+//

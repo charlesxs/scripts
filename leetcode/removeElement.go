@@ -50,3 +50,6 @@ func main() {
 	fmt.Println(RemoveElement(3, list))
 }
 
+
+// 问题描述: https://leetcode.com/problems/remove-element/description/
+//
