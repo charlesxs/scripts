@@ -5,7 +5,7 @@ import (
 )
 
 
-func RemoveDumplicates(list []int ) int {
+func RemoveDuplicates(list []int ) int {
 	length := len(list)
 	if length == 0 {
 		return length
@@ -26,7 +26,7 @@ func RemoveDumplicates(list []int ) int {
 func main() {
 	list := []int{1, 3, 3, 5, 6, 9, 9, 9, 9, 10, 10, 11}
 
-	r := RemoveDumplicates(list)
+	r := RemoveDuplicates(list)
 	fmt.Println(list[:r], r)
 }
 
