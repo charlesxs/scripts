@@ -60,7 +60,6 @@ rsyncFile() {
     tar cjf $filename $dir
     rsync -avz $filename $rsync_host::$rsync_module >> $log_dir/dbbackup.log 2>&1
     rm -f $filename
-    
 }
 
 clearOldFile() {
@@ -86,7 +85,9 @@ send_wechat() {
 							  s/(/%28/g;
 							  s/)/%29/g;
 							  s/:/%3A/g;
-							  s/\//%2F/g'`
+							  s/\//%2F/g;
+                              s/\[/%5B/g;
+                              s/\]/%5D/g'`
 
 	for user in $_users; do
 		curl http://isms.xxx.com/weixin.php?user=$user\&info="$_msg"\&channel=backup
