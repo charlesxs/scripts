@@ -21,14 +21,33 @@ def qsort(lst):
                 small += 1
                 lst[small], lst[j] = lst[j], lst[small]
         lst[begin], lst[small] = lst[small], lst[begin]
-        _qsort(lst, 0, small)
+        # _qsort(lst, 0, small)
+        _qsort(lst, begin, small)  # 将0改为 begin 优化此次递归,可少递归上百次
         _qsort(lst, small+1, end)
     _qsort(lst, 0, len(lst)-1)
     return lst
 
 
+# 这是自己写的方式,与上面不同的是此方法交换划分点自己, 上面的方法是不交换划分点自己.
+def qsort2(lst):
+    def _qsort(lst, begin, end):
+        if begin >= end:
+            return 
+        small, lastchange = begin, begin
+        data = lst[begin]
+        for j in range(begin+1, end+1):
+            if lst[j] < data:
+                lst[j], lst[small] = lst[small], lst[j]
+                small += 1
+                lastchange = j
+        lst[small], lst[lastchange] = lst[lastchange], lst[small] 
+        _qsort(lst, begin, small)
+        _qsort(lst, small+1, end)
+    _qsort(lst, 0, len(lst)-1)
+    return lst
+
 
 if __name__ == '__main__':
-    lst = [9, 11, 2, 4, 6, 199, 100, 200, 3, -1]
+    lst = [9, 11, 22, 4, 6, 199, 100, 200, 3, -1]
     print lst
     print qsort(lst)
