@@ -4,7 +4,6 @@ import (
 	"fmt"
 )
 
-
 func InsertSort(datalist []int) []int {
 	var j int
 
@@ -24,10 +23,8 @@ func InsertSort(datalist []int) []int {
 	return datalist
 }
 
-
-func main()  {
+func main() {
 	list := []int{2, 5, 3, 7, 10, 8, 4, 1, 100, 5, 100, 200, -1, -3}
 
 	fmt.Println(InsertSort(list))
 }
-
